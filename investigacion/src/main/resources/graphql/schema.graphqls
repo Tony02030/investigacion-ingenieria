@@ -1,0 +1,45 @@
+scalar Date
+
+scalar LocalDateTime
+
+
+type Query {
+    clients: [Client]
+}
+
+type Client{
+     id: ID
+     name: String,
+     address: String,
+     phone: String,
+     email: String,
+     birthDate: Date
+}
+
+type AccountType{
+    id: ID,
+    name: String
+}
+
+type Account{
+    accountNumber: String,
+    client: Client,
+    balance: Float,
+    accountType: AccountType
+}
+
+type Transaction {
+    id: ID,
+    sourceAccount: Account,
+    destinationAccount: Account,
+    dateTime: LocalDateTime,
+    amount: Float
+}
+
+type Loan{
+    id: ID,
+    client: Client,
+    amount: LocalDateTime,
+    interestRate: Float,
+    termMonths: Int
+}
