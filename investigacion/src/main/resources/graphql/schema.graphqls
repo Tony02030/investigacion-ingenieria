@@ -1,10 +1,13 @@
 scalar Date
 
-scalar LocalDateTime
 
 
 type Query {
-    clients: [Client]
+    clients: [Client],
+    accountType : [Account],
+    account : [Account],
+    transaction: [Transaction],
+    loan: [Loan]
 }
 
 type Client{
@@ -32,14 +35,14 @@ type Transaction {
     id: ID,
     sourceAccount: Account,
     destinationAccount: Account,
-    dateTime: LocalDateTime,
+    dateTime: Date,
     amount: Float
 }
 
 type Loan{
     id: ID,
     client: Client,
-    amount: LocalDateTime,
+    amount: Float,
     interestRate: Float,
     termMonths: Int
 }

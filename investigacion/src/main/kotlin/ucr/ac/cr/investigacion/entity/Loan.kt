@@ -12,6 +12,6 @@ data class Loan(
     @JoinColumn(name = "client_id")
     val client: Client,
     val amount: BigDecimal,
-    val interestRate: BigDecimal,
+    val interestRate: Float,
     val termMonths: Int
 )

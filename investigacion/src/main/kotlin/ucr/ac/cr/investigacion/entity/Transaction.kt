@@ -1,7 +1,7 @@
 package ucr.ac.cr.investigacion.entity
 
-import java.math.BigDecimal
 import jakarta.persistence.*
+import java.util.Date
 
 @Entity
 @Table(name = "Transactions")
@@ -14,6 +14,6 @@ data class Transaction(
     @ManyToOne
     @JoinColumn(name = "destination_account_number")
     val destinationAccount: Account,
-    val dateTime: java.sql.Timestamp,
-    val amount: BigDecimal
+    val dateTime: Date,
+    val amount: Float
 )
