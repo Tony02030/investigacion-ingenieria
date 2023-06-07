@@ -1,13 +1,15 @@
 scalar Date
 
-
-
 type Query {
     clients: [Client],
     accountType : [Account],
     account : [Account],
     transaction: [Transaction],
     loan: [Loan]
+}
+
+type Mutation {
+    addClient(client: ClientInput!): Client
 }
 
 type Client{
@@ -45,4 +47,12 @@ type Loan{
     amount: Float,
     interestRate: Float,
     termMonths: Int
+}
+
+input ClientInput {
+    name: String
+    address: String
+    phone: String
+    email: String
+    birthDate: Date
 }
