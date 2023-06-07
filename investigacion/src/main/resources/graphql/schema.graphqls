@@ -1,12 +1,28 @@
 scalar Date
 
 type Query {
+    ##########Client#############
     clients: [Client],
     clientById(id: ID!): Client
+
+    ##########Account############
+    accounts: [Account],
+    accountById(id: ID!) : Account
 }
 
 type Mutation {
+    ##########Client#############
     addClient(clientInput: ClientInput): Client
+    updateClient(id: ID!, clientInput : ClientInput!): Client
+    deleteClient(id: ID!) : Boolean
+
+    ##########Account############
+    addAccount(
+        accountNumber: String!,
+        clientId: Int!,
+        balance: Float!,
+        accountTypeId: Int!
+    ): Account!
 }
 
 type Client{
@@ -24,9 +40,9 @@ type AccountType{
 
 type Account{
     accountNumber: String,
-    client: Client,
-    balance: Float,
-    accountType: AccountType
+    client: Client!,
+    balance: Float!,
+    accountType: AccountType!
 }
 
 type Transaction {
@@ -51,4 +67,5 @@ input ClientInput {
     phone: String
     email: String!
     birthDate: Date
+    accountId: ID!
 }

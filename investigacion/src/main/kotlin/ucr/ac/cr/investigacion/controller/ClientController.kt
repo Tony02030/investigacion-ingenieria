@@ -1,17 +1,23 @@
 package ucr.ac.cr.investigacion.controller
 
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Client
 import ucr.ac.cr.investigacion.entity.input.ClientInput
+import ucr.ac.cr.investigacion.repository.AccountRepository
 import ucr.ac.cr.investigacion.repository.ClientRepository
 import java.util.*
 
 @Controller
-class ClientController @Autowired constructor(private val clientRepository : ClientRepository) {
+class ClientController @Autowired constructor(
+    private val clientRepository: ClientRepository,
+    private val accountController: AccountController
+) {
 
     @QueryMapping
     fun clients() : Iterable<Client> {
@@ -60,15 +66,11 @@ class ClientController @Autowired constructor(private val clientRepository : Cli
     }
 
     @MutationMapping
-    fun deleteClient(id: Int) : Boolean {
-        val clientOptional = clientById(id)
+    fun deleteClient(@Argument clientId: Int) : Boolean {
 
-        if(clientOptional.isPresent) {
-            clientRepository.deleteById(id)
-            return true
-        }
+        clientRepository.deleteById(clientId)
 
-        return false
+        return true
     }
 
 
