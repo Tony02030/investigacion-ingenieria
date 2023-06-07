@@ -2,28 +2,24 @@ scalar Date
 
 type Query {
     clients: [Client],
-    accountType : [Account],
-    account : [Account],
-    transaction: [Transaction],
-    loan: [Loan]
+    clientById(id: ID!): Client
 }
 
 type Mutation {
-    addClient(client: ClientInput!): Client
+    addClient(clientInput: ClientInput): Client
 }
 
 type Client{
-     id: ID
-     name: String,
-     address: String,
+     name: String!,
+     address: String!,
      phone: String,
-     email: String,
+     email: String!,
      birthDate: Date
 }
 
 type AccountType{
-    id: ID,
-    name: String
+    id: ID!,
+    name: String!
 }
 
 type Account{
@@ -34,7 +30,7 @@ type Account{
 }
 
 type Transaction {
-    id: ID,
+    id: ID!,
     sourceAccount: Account,
     destinationAccount: Account,
     dateTime: Date,
@@ -50,9 +46,9 @@ type Loan{
 }
 
 input ClientInput {
-    name: String
-    address: String
+    name: String!
+    address: String!
     phone: String
-    email: String
+    email: String!
     birthDate: Date
 }
