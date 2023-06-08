@@ -23,7 +23,7 @@ class AccountController @Autowired constructor(private val accountRepository: Ac
 
     @QueryMapping
     fun accountById(@Argument id : String) : Optional<Account> {
-        return accountRepository.findById(id);
+        return accountRepository.findById(id)
     }
 
 

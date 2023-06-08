@@ -1,27 +1,33 @@
 package ucr.ac.cr.investigacion.controller
 
+import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Client
+import ucr.ac.cr.investigacion.repository.AccountRepository
 import ucr.ac.cr.investigacion.repository.ClientRepository
+import java.lang.IllegalArgumentException
 import java.util.*
 
 @Controller
 class ClientController @Autowired constructor(
-    private val clientRepository: ClientRepository
+    private val clientRepository: ClientRepository,
+    private val accountRepository: AccountRepository
 ) {
 
     @QueryMapping
-    fun clients() : Iterable<Client> {
+    fun clients(): Iterable<Client> {
         return clientRepository.findAll()
     }
 
     @QueryMapping
-    fun clientById(@Argument id : Int) : Optional<Client> {
-        return clientRepository.findById(id);
+    fun clientById(@Argument id: Int) : Client {
+        return clientRepository.findById(id)
+            .orElseThrow{ NotFoundException() }
     }
 
     @MutationMapping
@@ -32,6 +38,11 @@ class ClientController @Autowired constructor(
         @Argument("email") email: String,
         @Argument("birthDate") birthDate: Date?
     ): Client {
+        //validate the arguments
+        if(name.isBlank() || address.isBlank() || email.isBlank() ) {
+            throw IllegalArgumentException("Los campos 'name', 'address' y 'email' son obligatorios")
+        }
+
         val client = Client(
             name = name,
             address = address,
@@ -44,14 +55,16 @@ class ClientController @Autowired constructor(
     }
 
     @MutationMapping
-    fun updateClient(@Argument id: Int, @Argument("name") name: String?,
-                     @Argument("address") address: String?,
-                     @Argument("phone") phone: String?,
-                     @Argument("email") email: String?,
-                     @Argument("birthDate") birthDate: Date?) : Optional<Client> {
-        val existingClientOptional = clientById(id)
-        if (existingClientOptional.isPresent) {
-            val existingClient = existingClientOptional.get()
+    fun updateClient(
+        @Argument id: Int,
+        @Argument("name") name: String?,
+        @Argument("address") address: String?,
+        @Argument("phone") phone: String?,
+        @Argument("email") email: String?,
+        @Argument("birthDate") birthDate: Date?
+    ): Client {
+        val existingClient = clientRepository.findById(id)
+            .orElseThrow { NotFoundException() }
 
             // Create a new client with updated properties
             val updatedClient = existingClient.copy(
@@ -62,18 +75,20 @@ class ClientController @Autowired constructor(
                 birthDate = birthDate ?: existingClient.birthDate
             )
 
-            val savedClient = clientRepository.save(updatedClient)
-            return Optional.of(savedClient)
-        } else {
-            return Optional.empty()
-        }
+            return clientRepository.save(updatedClient)
 
     }
 
     @MutationMapping
-    fun deleteClient(@Argument clientId: Int) : Boolean {
+    @Transactional
+    fun deleteClient(@Argument id: Int) : Boolean {
+        println(id)
+        val existingClient = clientRepository.findById(id)
+            .orElseThrow{ NotFoundException() }
 
-        clientRepository.deleteById(clientId)
+        accountRepository.deleteByClient(existingClient)
+
+        clientRepository.delete(existingClient)
 
         return true
     }
