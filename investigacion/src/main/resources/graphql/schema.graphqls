@@ -12,9 +12,26 @@ type Query {
 
 type Mutation {
     ##########Client#############
-    addClient(clientInput: ClientInput): Client
-    updateClient(id: ID!, clientInput : ClientInput!): Client
-    deleteClient(id: ID!) : Boolean
+    addClient(
+        name: String!
+        address: String!
+        phone: String
+        email: String!
+        birthDate: Date
+        accountId: ID!
+    ): Client!
+    updateClient(
+        id: ID!,
+        name: String
+        address: String
+        phone: String
+        email: String
+        birthDate: Date
+        accountId: ID
+    ): Client
+    deleteClient(
+        id: ID!
+    ) : Boolean
 
     ##########Account############
     addAccount(
@@ -26,10 +43,10 @@ type Mutation {
 }
 
 type Client{
-     name: String!,
-     address: String!,
+     name: String,
+     address: String,
      phone: String,
-     email: String!,
+     email: String,
      birthDate: Date
 }
 
@@ -59,13 +76,4 @@ type Loan{
     amount: Float,
     interestRate: Float,
     termMonths: Int
-}
-
-input ClientInput {
-    name: String!
-    address: String!
-    phone: String
-    email: String!
-    birthDate: Date
-    accountId: ID!
 }

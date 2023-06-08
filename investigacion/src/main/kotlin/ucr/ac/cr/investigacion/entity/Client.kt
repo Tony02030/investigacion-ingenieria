@@ -10,9 +10,9 @@ data class Client(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Int = 0,
-    val name: String,
+    val name: String?,
     val address: String,
-    val phone: String,
-    val email: String,
-    val birthDate: Date
+    val phone: String?,
+    val email: String?,
+    val birthDate: Date?
 )

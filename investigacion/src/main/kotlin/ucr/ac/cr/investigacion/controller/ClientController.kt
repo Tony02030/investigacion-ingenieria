@@ -1,22 +1,17 @@
 package ucr.ac.cr.investigacion.controller
 
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Client
-import ucr.ac.cr.investigacion.entity.input.ClientInput
-import ucr.ac.cr.investigacion.repository.AccountRepository
 import ucr.ac.cr.investigacion.repository.ClientRepository
 import java.util.*
 
 @Controller
 class ClientController @Autowired constructor(
-    private val clientRepository: ClientRepository,
-    private val accountController: AccountController
+    private val clientRepository: ClientRepository
 ) {
 
     @QueryMapping
@@ -30,31 +25,41 @@ class ClientController @Autowired constructor(
     }
 
     @MutationMapping
-    fun addClient(@Argument clientInput : ClientInput) : Client {
+    fun addClient(
+        @Argument("name") name: String,
+        @Argument("address") address: String,
+        @Argument("phone") phone: String?,
+        @Argument("email") email: String,
+        @Argument("birthDate") birthDate: Date?
+    ): Client {
         val client = Client(
-            name = clientInput.name,
-            address = clientInput.address,
-            phone = clientInput.phone,
-            email = clientInput.email,
-            birthDate = clientInput.birthDate
+            name = name,
+            address = address,
+            phone = phone,
+            email = email,
+            birthDate = birthDate
         )
 
-        return clientRepository.save(client);
+        return clientRepository.save(client)
     }
 
     @MutationMapping
-    fun updateClient(@Argument id: Int, @Argument clientInput: ClientInput) : Optional<Client> {
+    fun updateClient(@Argument id: Int, @Argument("name") name: String?,
+                     @Argument("address") address: String?,
+                     @Argument("phone") phone: String?,
+                     @Argument("email") email: String?,
+                     @Argument("birthDate") birthDate: Date?) : Optional<Client> {
         val existingClientOptional = clientById(id)
         if (existingClientOptional.isPresent) {
             val existingClient = existingClientOptional.get()
 
             // Create a new client with updated properties
             val updatedClient = existingClient.copy(
-                name = clientInput.name ?: existingClient.name,
-                address = clientInput.address ?: existingClient.address,
-                phone = clientInput.phone ?: existingClient.phone,
-                email = clientInput.email ?: existingClient.email,
-                birthDate = clientInput.birthDate ?: existingClient.birthDate
+                name = name ?: existingClient.name,
+                address = address ?: existingClient.address,
+                phone = phone ?: existingClient.phone,
+                email = email ?: existingClient.email,
+                birthDate = birthDate ?: existingClient.birthDate
             )
 
             val savedClient = clientRepository.save(updatedClient)
