@@ -4,6 +4,10 @@
 
 ### Kotlin
 
+- <a href="https://www.oracle.com/java/technologies/downloads/">JDK</a>
+
+Para esta implementación se utilizó el JDK 17
+
 - <a href="https://www.jetbrains.com/idea/download/">Intellij Ultimate</a>
 
 Utilizaremos esta versión del IDE porque se trabajará con el framework de SpringBoot.
