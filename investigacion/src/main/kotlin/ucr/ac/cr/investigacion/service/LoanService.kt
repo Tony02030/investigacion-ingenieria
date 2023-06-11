@@ -37,26 +37,22 @@ class LoanService(
         return savedLoan != null
     }
 
-    fun updateLoan(loan: Loan, clientId: Int?): Boolean {
-        clientId?.let { id ->
-            val client = clientRepository.findById(id)
-                .orElseThrow { NotFoundException() }
+    fun updateLoan(
+        loanId: Int,
+        updatedFields: Map<String, Any?>
+    ): Boolean {
+        val existingLoan = loanRepository.findById(loanId)
+            .orElseThrow { NotFoundException() }
 
-            val updatedLoan = Loan(
-                id = loan.id,
-                client = client,
-                amount = loan.amount,
-                interestRate = loan.interestRate,
-                termMonths = loan.termMonths
-            )
+        val updatedLoan = existingLoan.copy(
+            amount = updatedFields["amount"] as? Float ?: existingLoan.amount,
+            interestRate = updatedFields["interestRate"] as? Float ?: existingLoan.interestRate,
+            termMonths = updatedFields["termMonths"] as? Int ?: existingLoan.termMonths
+        )
 
-            val savedLoan = loanRepository.save(updatedLoan)
-            return savedLoan != null
+        loanRepository.save(updatedLoan)
+        return true
         }
-
-        val savedLoan = loanRepository.save(loan)
-        return savedLoan != null
-    }
 
 
     fun deleteLoan(id: Int): Boolean {

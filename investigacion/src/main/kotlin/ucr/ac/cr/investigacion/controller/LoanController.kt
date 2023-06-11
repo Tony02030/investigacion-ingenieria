@@ -13,8 +13,6 @@ import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Loan
 import ucr.ac.cr.investigacion.service.ClientService
 import ucr.ac.cr.investigacion.service.LoanService
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.util.NoSuchElementException
 
 @Controller
@@ -40,9 +38,10 @@ class LoanController @Autowired constructor(
         @Argument("termMonths") termMonths: Int
     ): Boolean {
         // Validate the arguments
-        if (clientId <= 0 || amount <= 0 || interestRate <= 0 || termMonths <= 0) {
-            throw IllegalArgumentException("Invalid loan data")
-        }
+            if (clientId <= 0 || amount <= 0 || interestRate <= 0 || termMonths <= 0) {
+                throw IllegalArgumentException("Invalid loan data")
+            }
+
 
         val client = clientService.clientById(clientId)
             .orElseThrow { NoSuchElementException("Client not found!") }
@@ -60,23 +59,16 @@ class LoanController @Autowired constructor(
     @MutationMapping
     fun updateLoan(
         @Argument("loanId") loanId: Int,
-        @Argument("clientId") clientId: Int,
         @Argument("amount") amount: Float?,
         @Argument("interestRate") interestRate: Float?,
         @Argument("termMonths") termMonths: Int?
     ): Boolean {
-        val client = clientService.clientById(clientId)
-            .orElseThrow { NoSuchElementException("Client not found!") }
-
-        val loan = Loan(
-            id = loanId,
-            client = client, // Assign the client based on the client ID
-            amount = amount,
-            interestRate = interestRate,
-            termMonths = termMonths ?: 0
+        val updatedFields = mapOf(
+            "amount" to amount,
+            "interestRate" to interestRate,
+            "termMonths" to termMonths
         )
-
-        return loanService.updateLoan(loan, clientId)
+        return loanService.updateLoan(loanId, updatedFields)
     }
 
     @MutationMapping

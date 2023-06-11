@@ -9,5 +9,5 @@ import java.util.Optional
 @Repository
 interface AccountRepository : JpaRepository<Account, String> {
     fun findByAccountNumber(accountNumber: String): Optional<Account>
-    fun getAccountsByClient(client: Client): List<Account>
+    fun getAccountsByClient(client: Optional<Client>): List<Account>
 }

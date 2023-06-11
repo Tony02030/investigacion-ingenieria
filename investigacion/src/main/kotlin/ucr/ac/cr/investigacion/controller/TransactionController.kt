@@ -1,9 +1,5 @@
 package ucr.ac.cr.investigacion.controller
 
-import graphql.scalars.ExtendedScalars
-import graphql.schema.GraphQLScalarType
-import graphql.schema.idl.RuntimeWiring
-import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
@@ -12,14 +8,14 @@ import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Account
 import ucr.ac.cr.investigacion.entity.Transaction
+import ucr.ac.cr.investigacion.service.AccountService
 import ucr.ac.cr.investigacion.service.TransactionService
-import java.math.BigDecimal
-import java.math.RoundingMode
 import java.time.LocalDateTime
 
 @Controller
 class TransactionController @Autowired constructor(
-    private val transactionService: TransactionService
+    private val transactionService: TransactionService,
+    private val accountService: AccountService
 ) {
 
     @QueryMapping
@@ -35,19 +31,16 @@ class TransactionController @Autowired constructor(
 
     @MutationMapping
     fun addTransaction(
-        @Argument("sourceAccount") sourceAccount: Account,
-        @Argument("destinationAccount") destinationAccount: Account,
+        @Argument("sourceAccount") sourceAccount: String,
+        @Argument("destinationAccount") destinationAccount: String,
         @Argument("amount") amount: Float
     ): Transaction {
-        // Validate the arguments
-        if (sourceAccount.accountNumber.isBlank() || destinationAccount.accountNumber.isBlank() || amount <= 0) {
-            throw IllegalArgumentException("Invalid transaction data")
-        }
+        val sourceAccount = accountService.getAccountById(sourceAccount)
+        val destinationAccount = accountService.getAccountById(destinationAccount)
 
         val transaction = Transaction(
-            id = 0,
-            sourceAccount = sourceAccount,
-            destinationAccount = destinationAccount,
+            sourceAccount = sourceAccount.get(),
+            destinationAccount = destinationAccount.get(),
             amount = amount,
             dateTime = LocalDateTime.now()
         )
@@ -62,7 +55,7 @@ class TransactionController @Autowired constructor(
         @Argument("destinationAccount") destinationAccount: Account?,
         @Argument("amount") amount: Float?,
         @Argument("dateTime") dateTime: LocalDateTime?
-    ): Transaction {
+    ): Boolean {
         val existingTransaction = transactionService.getTransactionById(id)
             .orElseThrow { NotFoundException() }
 

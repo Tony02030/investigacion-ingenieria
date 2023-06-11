@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service
 import ucr.ac.cr.investigacion.entity.Transaction
 import ucr.ac.cr.investigacion.repository.TransactionRepository
 import java.lang.IllegalStateException
-import java.time.LocalDateTime
 import java.util.*
 
 @Service
@@ -21,11 +20,25 @@ class TransactionService(
     }
 
     fun addTransaction(transaction: Transaction): Transaction {
+        validateTransactionData(transaction)
+
         val savedTransaction = transactionRepository.save(transaction)
-        return savedTransaction ?: throw IllegalStateException("Failed to save transaction")
+        return savedTransaction
     }
 
-    fun updateTransaction(updatedTransaction: Transaction): Transaction {
+    private fun validateTransactionData(transaction: Transaction) {
+        if(transaction.sourceAccount.accountNumber.isBlank()) {
+            throw IllegalArgumentException("Source account number is required")
+        }
+        if(transaction.destinationAccount.accountNumber.isBlank()) {
+            throw IllegalArgumentException("Destination account number is required")
+        }
+        if(transaction.amount < 0) {
+            throw IllegalArgumentException("Amount must be greater than zero")
+        }
+    }
+
+    fun updateTransaction(updatedTransaction: Transaction): Boolean {
         val existingTransaction = transactionRepository.findById(updatedTransaction.id)
             .orElseThrow { NotFoundException() }
 
@@ -41,7 +54,8 @@ class TransactionService(
             dateTime = updatedDateTime
         )
 
-        return transactionRepository.save(existingTransaction)
+        transactionRepository.save(updatedTransaction)
+        return true
     }
 
     fun deleteTransaction(id: Int) {

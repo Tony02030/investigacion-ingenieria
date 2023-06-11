@@ -14,11 +14,12 @@ data class Loan(
     @JoinColumn(name = "client_id")
     val client: Client,
 
-    @Column(precision = 10, scale = 2)
+    @Column
     val amount: Float?,
 
-    @Column(precision = 5, scale = 2)
+    @Column
     val interestRate: Float?,
 
+    @Column
     val termMonths: Int?
 )

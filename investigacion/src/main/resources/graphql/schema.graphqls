@@ -31,7 +31,6 @@ type Mutation {
         phone: String
         email: String!
         birthDate: Date
-        accountId: ID!
     ): Client!
     updateClient(
         id: ID!,
@@ -99,8 +98,7 @@ type Mutation {
     ): Transaction
     updateTransaction(
         id: ID!,
-        amount: Float,
-        dateTime: LocalDateTime
+        amount: Float
     ): Boolean
     deleteTransaction(
         id: ID!
@@ -127,7 +125,6 @@ type Account{
 }
 
 type Transaction {
-    id: ID!,
     sourceAccount: Account,
     destinationAccount: Account,
     dateTime: LocalDateTime,
@@ -135,7 +132,6 @@ type Transaction {
 }
 
 type Loan{
-    id: ID,
     client: Client,
     amount: Float,
     interestRate: Float,

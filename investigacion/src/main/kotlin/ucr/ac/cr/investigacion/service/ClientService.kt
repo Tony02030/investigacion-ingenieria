@@ -24,7 +24,7 @@ class ClientService(
 
     fun addClient(client: Client): Boolean {
         val client: Client = clientRepository.save(client)
-        return client == null
+        return client != null
     }
 
     fun updateClient(updatedClient: Client): Boolean {
@@ -41,19 +41,23 @@ class ClientService(
     }
 
     fun deleteClient(id: Int): Boolean {
-        val existingClient = clientRepository.findById(id)
-            .orElseThrow { NotFoundException() }
 
-        val accounts = accountRepository.getAccountsByClient(existingClient)
-        accounts.forEach { account ->
-            transactionRepository.deleteTransactionsBySourceAccountOrDestinationAccount(account, account)
-            accountRepository.delete(account)
+            val existingClient = clientRepository.findById(id)
+
+            val accounts = accountRepository.getAccountsByClient(existingClient)
+            accounts.forEach { account ->
+                transactionRepository.deleteTransactionsBySourceAccountOrDestinationAccount(account, account)
+                accountRepository.delete(account)
+            }
+        if(existingClient.isEmpty) {
+            return false
+        } else {
+
+            loanRepository.deleteLoansByClient(existingClient)
+
+            clientRepository.deleteById(id)
+            return true
         }
 
-        loanRepository.deleteLoansByClient(existingClient)
-
-        clientRepository.delete(existingClient)
-
-        return true
     }
 }

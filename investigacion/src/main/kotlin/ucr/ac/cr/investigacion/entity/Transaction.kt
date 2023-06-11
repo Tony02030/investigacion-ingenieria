@@ -9,7 +9,8 @@ import java.util.Date
 @Table(name = "Transactions")
 data class Transaction(
     @Id
-    val id: Int,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int = 0,
     @ManyToOne
     @JoinColumn(name = "source_account_number")
     val sourceAccount: Account,

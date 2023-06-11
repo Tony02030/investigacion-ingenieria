@@ -79,10 +79,6 @@ class ClientController @Autowired constructor(
 
     @MutationMapping
     @Transactional
-    fun deleteClient(@Argument id: Int) : Boolean {
-        clientService.deleteClient(id)
-        return true
-    }
-
+    fun deleteClient(@Argument id: Int) : Boolean = clientService.deleteClient(id)
 
 }
