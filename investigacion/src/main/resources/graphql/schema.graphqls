@@ -36,9 +36,9 @@ type Mutation {
     ##########Account############
     addAccount(
         accountNumber: String!,
-        clientId: Int!,
+        clientId: ID!,
         balance: Float!,
-        accountTypeId: Int!
+        accountTypeId: ID!
     ): Account!
 }
 
@@ -57,7 +57,7 @@ type AccountType{
 
 type Account{
     accountNumber: String,
-    client: Client!,
+    client: Client,
     balance: Float!,
     accountType: AccountType!
 }

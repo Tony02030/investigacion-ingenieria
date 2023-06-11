@@ -1,6 +1,8 @@
 package ucr.ac.cr.investigacion.entity
 
 import jakarta.persistence.*
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.Date
 
 @Entity
@@ -14,6 +16,6 @@ data class Transaction(
     @ManyToOne
     @JoinColumn(name = "destination_account_number")
     val destinationAccount: Account,
-    val dateTime: Date,
-    val amount: Float
+    val dateTime: LocalDateTime,
+    val amount: BigDecimal
 )

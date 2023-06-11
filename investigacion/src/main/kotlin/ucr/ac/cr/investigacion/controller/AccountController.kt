@@ -1,7 +1,5 @@
 package ucr.ac.cr.investigacion.controller
 
-import ucr.ac.cr.investigacion.repository.AccountTypeRepository
-import ucr.ac.cr.investigacion.repository.ClientRepository
 import java.math.BigDecimal
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import java.util.*
@@ -10,22 +8,25 @@ import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
+import org.springframework.transaction.annotation.Transactional
 import ucr.ac.cr.investigacion.entity.Account
-import ucr.ac.cr.investigacion.repository.AccountRepository
+import ucr.ac.cr.investigacion.service.AccountService
 
 @Controller
-class AccountController @Autowired constructor(private val accountRepository: AccountRepository, private val clientRepository: ClientRepository, private val accountTypeRepository: AccountTypeRepository)  {
+class AccountController @Autowired constructor(
+    private val accountService: AccountService,
+){
 
     @QueryMapping
-    fun accounts(): Iterable<Account> {
-        return accountRepository.findAll()
+    fun accounts(): List<Account> {
+        return accountService.getAccounts()
     }
 
     @QueryMapping
-    fun accountById(@Argument id : String) : Optional<Account> {
-        return accountRepository.findById(id)
+    fun accountById(@Argument id : String) : Account {
+        return accountService.getAccountById(id)
+            .orElseThrow { NotFoundException() }
     }
-
 
     @MutationMapping
     fun addAccount(
@@ -34,20 +35,23 @@ class AccountController @Autowired constructor(private val accountRepository: Ac
         @Argument("balance") balance: BigDecimal,
         @Argument("accountTypeId") accountTypeId: Int
     ): Account {
-        val client = clientRepository.findById(clientId)
-            .orElseThrow { NotFoundException() }
 
-        val accountType = accountTypeRepository.findById(accountTypeId)
-            .orElseThrow { NotFoundException() }
+        return accountService.addAccount(accountNumber, clientId, balance, accountTypeId)
+    }
 
-        val account = Account(
-            accountNumber = accountNumber,
-            client = client,
-            balance = balance,
-            accountType = accountType
-        )
+    @MutationMapping
+    fun updateAccount(
+        @Argument("accountNumber") accountNumber: String,
+        @Argument("balance") balance: BigDecimal,
+    ): Boolean {
+        return accountService.updateAccount(accountNumber, balance)
+    }
 
-        return accountRepository.save(account)
+    @MutationMapping
+    @Transactional
+    fun deleteAccount(@Argument accountNumber: String): Boolean {
+        accountService.deleteAccount(accountNumber)
+        return true
     }
 
 }

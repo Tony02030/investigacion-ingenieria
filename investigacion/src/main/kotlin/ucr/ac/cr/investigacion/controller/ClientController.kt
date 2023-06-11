@@ -8,25 +8,23 @@ import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import ucr.ac.cr.investigacion.entity.Client
-import ucr.ac.cr.investigacion.repository.AccountRepository
-import ucr.ac.cr.investigacion.repository.ClientRepository
+import ucr.ac.cr.investigacion.service.ClientService
 import java.lang.IllegalArgumentException
 import java.util.*
 
 @Controller
 class ClientController @Autowired constructor(
-    private val clientRepository: ClientRepository,
-    private val accountRepository: AccountRepository
+    private val clientService: ClientService
 ) {
 
     @QueryMapping
     fun clients(): Iterable<Client> {
-        return clientRepository.findAll()
+        return clientService.clients()
     }
 
     @QueryMapping
     fun clientById(@Argument id: Int) : Client {
-        return clientRepository.findById(id)
+        return clientService.clientById(id)
             .orElseThrow{ NotFoundException() }
     }
 
@@ -37,7 +35,7 @@ class ClientController @Autowired constructor(
         @Argument("phone") phone: String?,
         @Argument("email") email: String,
         @Argument("birthDate") birthDate: Date?
-    ): Client {
+    ): Boolean {
         //validate the arguments
         if(name.isBlank() || address.isBlank() || email.isBlank() ) {
             throw IllegalArgumentException("Los campos 'name', 'address' y 'email' son obligatorios")
@@ -51,7 +49,7 @@ class ClientController @Autowired constructor(
             birthDate = birthDate
         )
 
-        return clientRepository.save(client)
+        return clientService.addClient(client)
     }
 
     @MutationMapping
@@ -62,8 +60,8 @@ class ClientController @Autowired constructor(
         @Argument("phone") phone: String?,
         @Argument("email") email: String?,
         @Argument("birthDate") birthDate: Date?
-    ): Client {
-        val existingClient = clientRepository.findById(id)
+    ): Boolean {
+        val existingClient = clientService.clientById(id)
             .orElseThrow { NotFoundException() }
 
             // Create a new client with updated properties
@@ -75,21 +73,14 @@ class ClientController @Autowired constructor(
                 birthDate = birthDate ?: existingClient.birthDate
             )
 
-            return clientRepository.save(updatedClient)
+            return clientService.updateClient(updatedClient)
 
     }
 
     @MutationMapping
     @Transactional
     fun deleteClient(@Argument id: Int) : Boolean {
-        println(id)
-        val existingClient = clientRepository.findById(id)
-            .orElseThrow{ NotFoundException() }
-
-        accountRepository.deleteByClient(existingClient)
-
-        clientRepository.delete(existingClient)
-
+        clientService.deleteClient(id)
         return true
     }
 
