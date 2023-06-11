@@ -15,6 +15,13 @@ class AccountTypeController @Autowired constructor(
     private val accountTypeService: AccountTypeService
 ) {
 
+    @PostMapping("/account-type")
+    @ResponseBody
+    fun createAccount(@RequestBody accountType: AccountType): AccountType {
+        val createAccountType = accountTypeRepository.save(accountType)
+        return createAccountType
+    }
+
     @QueryMapping
     fun accountTypes(): List<AccountType> {
         return accountTypeService.getAccountTypes()
