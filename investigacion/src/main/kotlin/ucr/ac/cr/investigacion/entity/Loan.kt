@@ -7,11 +7,19 @@ import jakarta.persistence.*
 @Table(name = "Loans")
 data class Loan(
     @Id
-    val id: Int,
+    @GeneratedValue(strategy =  GenerationType.IDENTITY)
+    val id: Int = 0,
+
     @ManyToOne
     @JoinColumn(name = "client_id")
     val client: Client,
-    val amount: BigDecimal,
-    val interestRate: Float,
-    val termMonths: Int
+
+    @Column
+    val amount: Float?,
+
+    @Column
+    val interestRate: Float?,
+
+    @Column
+    val termMonths: Int?
 )

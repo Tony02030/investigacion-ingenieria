@@ -64,6 +64,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-graphql</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.graphql-java</groupId>
+			<artifactId>graphql-java-extended-scalars</artifactId>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.expediagroup/graphql-kotlin-spring-server -->
+		<dependency>
+			<groupId>com.expediagroup</groupId>
+			<artifactId>graphql-kotlin-spring-server</artifactId>
+			<version>6.5.2</version>
+		</dependency>
+
 		<!-- https://mvnrepository.com/artifact/com.graphql-java-kickstart/playground-spring-boot-starter -->
 		<dependency>
 			<groupId>com.graphql-java-kickstart</groupId>

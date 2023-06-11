@@ -7,5 +7,7 @@ import org.springframework.boot.runApplication
 class InvestigacionApplication
 
 fun main(args: Array<String>) {
+
 	runApplication<InvestigacionApplication>(*args)
 }
+

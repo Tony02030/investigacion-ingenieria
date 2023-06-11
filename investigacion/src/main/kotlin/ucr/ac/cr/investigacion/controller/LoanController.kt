@@ -1,28 +1,83 @@
 package ucr.ac.cr.investigacion.controller
 
+import graphql.scalars.ExtendedScalars
+import graphql.schema.GraphQLScalarType
+import graphql.schema.idl.RuntimeWiring
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
+import org.springframework.graphql.data.method.annotation.Argument
+import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseBody
 import ucr.ac.cr.investigacion.entity.Loan
-import ucr.ac.cr.investigacion.entity.Transaction
-import ucr.ac.cr.investigacion.repository.LoanRepository
-import ucr.ac.cr.investigacion.repository.TransactionRepository
+import ucr.ac.cr.investigacion.service.ClientService
+import ucr.ac.cr.investigacion.service.LoanService
+import java.util.NoSuchElementException
 
 @Controller
-class LoanController @Autowired constructor(private val loanRepository: LoanRepository) {
 
-    @PostMapping("/loan")
-    @ResponseBody
-    fun createLoan(@RequestBody loan: Loan): Loan {
-        val createLoan = loanRepository.save(loan)
-        return createLoan
+class LoanController @Autowired constructor(
+    private val loanService: LoanService,
+    private val clientService: ClientService
+) {
+    @QueryMapping
+    fun loans(): List<Loan> {
+        return loanService.getAllLoans()
     }
 
     @QueryMapping
-    fun loan(): Iterable<Loan> {
-        return loanRepository.findAll()
+    fun loanById(@Argument id: Int): Loan {
+        return loanService.getLoanById(id)
+            .orElseThrow { NotFoundException() }
+    }
+
+    @MutationMapping
+    fun addLoan(
+        @Argument("clientId") clientId: Int,
+        @Argument("amount") amount: Float,
+        @Argument("interestRate") interestRate: Float,
+        @Argument("termMonths") termMonths: Int
+    ): Boolean {
+        // Validate the arguments
+            if (clientId <= 0 || amount <= 0 || interestRate <= 0 || termMonths <= 0) {
+                throw IllegalArgumentException("Invalid loan data")
+            }
+
+
+        val client = clientService.clientById(clientId)
+            .orElseThrow { NoSuchElementException("Client not found!") }
+
+        val loan = Loan(
+            client = client,
+            amount = amount,
+            interestRate = interestRate,
+            termMonths = termMonths
+        )
+
+        return loanService.addLoan(loan, clientId)
+    }
+
+    @MutationMapping
+    fun updateLoan(
+        @Argument("loanId") loanId: Int,
+        @Argument("amount") amount: Float?,
+        @Argument("interestRate") interestRate: Float?,
+        @Argument("termMonths") termMonths: Int?
+    ): Boolean {
+        val updatedFields = mapOf(
+            "amount" to amount,
+            "interestRate" to interestRate,
+            "termMonths" to termMonths
+        )
+        return loanService.updateLoan(loanId, updatedFields)
+    }
+
+    @MutationMapping
+    fun deleteLoan(@Argument id: Int): Boolean {
+        return loanService.deleteLoan(id)
     }
 }

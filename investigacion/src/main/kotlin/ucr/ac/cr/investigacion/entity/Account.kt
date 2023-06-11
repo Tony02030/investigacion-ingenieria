@@ -8,10 +8,13 @@ import java.math.BigDecimal
 data class Account(
     @Id
     val accountNumber: String,
+
     @ManyToOne
     @JoinColumn(name = "client_id")
     val client: Client,
+
     val balance: BigDecimal,
+
     @ManyToOne
     @JoinColumn(name = "account_type")
     val accountType: AccountType

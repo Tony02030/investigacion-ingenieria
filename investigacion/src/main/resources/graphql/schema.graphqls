@@ -1,17 +1,111 @@
 scalar Date
-
-
+scalar LocalDateTime
 
 type Query {
+    ##########Client#############
     clients: [Client],
-    accountType : [Account],
-    account : [Account],
-    transaction: [Transaction],
-    loan: [Loan]
+    clientById(id: ID!): Client
+
+    ##########Account############
+    accounts: [Account],
+    accountById(id: ID!) : Account
+
+    ##########Account Type############
+    accountTypes: [AccountType],
+    accountTypeById(id: ID!) : AccountType
+
+    ##########Loan############
+    loans: [Loan],
+    loanById(id: ID!) : Loan
+
+    ##########Transaction############
+    transactions: [Transaction],
+    transactionById(id: ID!) : Transaction
+}
+
+type Mutation {
+    ##########Client#############
+    addClient(
+        name: String!
+        address: String!
+        phone: String
+        email: String!
+        birthDate: Date
+    ): Client!
+    updateClient(
+        id: ID!,
+        name: String
+        address: String
+        phone: String
+        email: String
+        birthDate: Date
+        accountId: ID
+    ): Client
+    deleteClient(
+        id: ID!
+    ) : Boolean
+
+    ##########Account############
+    addAccount(
+        accountNumber: String!,
+        clientId: ID!,
+        balance: Float!,
+        accountTypeId: ID!
+    ): Account!
+    updateAccount(
+        accountNumber: String!,
+        balance: Float!
+    ): Boolean!
+    deleteAccount(
+        accountNumber: String!
+    ): Boolean
+
+    ###########Account Type##########
+    addAccountType(
+        name: String!
+    ): Boolean
+    updateAccountType(
+        id: ID!,
+        name: String
+    ): Boolean
+    deleteAccountType(
+        id: ID!
+    ): Boolean
+
+    ###########Loan##########
+    addLoan(
+        clientId: Int!,
+        amount: Float!,
+        interestRate: Float!,
+        termMonths: Int!
+    ): Boolean
+    updateLoan(
+        loanId: Int!,
+        clientId: Int,
+        amount: Float,
+        interestRate: Float,
+        termMonths: Int
+    ): Boolean
+    deleteLoan(
+        id: Int!
+    ): Boolean
+
+    ###########Transaction########
+    addTransaction(
+        sourceAccount: String!,
+        destinationAccount: String!,
+        amount: Float!
+    ): Transaction
+    updateTransaction(
+        id: ID!,
+        amount: Float
+    ): Boolean
+    deleteTransaction(
+        id: ID!
+    ): Boolean
 }
 
 type Client{
-     id: ID
      name: String,
      address: String,
      phone: String,
@@ -20,27 +114,24 @@ type Client{
 }
 
 type AccountType{
-    id: ID,
-    name: String
+    name: String!
 }
 
 type Account{
     accountNumber: String,
     client: Client,
-    balance: Float,
-    accountType: AccountType
+    balance: Float!,
+    accountType: AccountType!
 }
 
 type Transaction {
-    id: ID,
     sourceAccount: Account,
     destinationAccount: Account,
-    dateTime: Date,
+    dateTime: LocalDateTime,
     amount: Float
 }
 
 type Loan{
-    id: ID,
     client: Client,
     amount: Float,
     interestRate: Float,
