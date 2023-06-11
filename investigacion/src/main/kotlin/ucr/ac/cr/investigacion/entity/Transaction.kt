@@ -17,5 +17,5 @@ data class Transaction(
     @JoinColumn(name = "destination_account_number")
     val destinationAccount: Account,
     val dateTime: LocalDateTime,
-    val amount: BigDecimal
+    val amount: Float
 )

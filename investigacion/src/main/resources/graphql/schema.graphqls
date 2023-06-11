@@ -1,4 +1,5 @@
 scalar Date
+scalar LocalDateTime
 
 type Query {
     ##########Client#############
@@ -8,6 +9,18 @@ type Query {
     ##########Account############
     accounts: [Account],
     accountById(id: ID!) : Account
+
+    ##########Account Type############
+    accountTypes: [AccountType],
+    accountTypeById(id: ID!) : AccountType
+
+    ##########Loan############
+    loans: [Loan],
+    loanById(id: ID!) : Loan
+
+    ##########Transaction############
+    transactions: [Transaction],
+    transactionById(id: ID!) : Transaction
 }
 
 type Mutation {
@@ -40,6 +53,58 @@ type Mutation {
         balance: Float!,
         accountTypeId: ID!
     ): Account!
+    updateAccount(
+        accountNumber: String!,
+        balance: Float!
+    ): Boolean!
+    deleteAccount(
+        accountNumber: String!
+    ): Boolean
+
+    ###########Account Type##########
+    addAccountType(
+        name: String!
+    ): Boolean
+    updateAccountType(
+        id: ID!,
+        name: String
+    ): Boolean
+    deleteAccountType(
+        id: ID!
+    ): Boolean
+
+    ###########Loan##########
+    addLoan(
+        clientId: Int!,
+        amount: Float!,
+        interestRate: Float!,
+        termMonths: Int!
+    ): Boolean
+    updateLoan(
+        loanId: Int!,
+        clientId: Int,
+        amount: Float,
+        interestRate: Float,
+        termMonths: Int
+    ): Boolean
+    deleteLoan(
+        id: Int!
+    ): Boolean
+
+    ###########Transaction########
+    addTransaction(
+        sourceAccount: String!,
+        destinationAccount: String!,
+        amount: Float!
+    ): Transaction
+    updateTransaction(
+        id: ID!,
+        amount: Float,
+        dateTime: LocalDateTime
+    ): Boolean
+    deleteTransaction(
+        id: ID!
+    ): Boolean
 }
 
 type Client{
@@ -51,7 +116,6 @@ type Client{
 }
 
 type AccountType{
-    id: ID!,
     name: String!
 }
 
@@ -66,7 +130,7 @@ type Transaction {
     id: ID!,
     sourceAccount: Account,
     destinationAccount: Account,
-    dateTime: Date,
+    dateTime: LocalDateTime,
     amount: Float
 }
 

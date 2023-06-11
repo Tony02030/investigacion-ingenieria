@@ -16,7 +16,7 @@ class AccountTypeController @Autowired constructor(
 ) {
 
     @QueryMapping
-    fun accountType(): Iterable<AccountType> {
+    fun accountTypes(): List<AccountType> {
         return accountTypeService.getAccountTypes()
     }
 
@@ -35,7 +35,6 @@ class AccountTypeController @Autowired constructor(
         }
 
         val accountType = AccountType(
-            id = 0,
             name = name
         )
 

@@ -6,6 +6,7 @@ import jakarta.persistence.*
 @Table(name = "Account_Type")
 data class AccountType(
     @Id
-    val id: Int,
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Int? = null,
     val name: String
 )

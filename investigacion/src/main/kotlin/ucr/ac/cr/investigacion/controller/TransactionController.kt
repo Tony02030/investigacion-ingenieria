@@ -1,5 +1,9 @@
 package ucr.ac.cr.investigacion.controller
 
+import graphql.scalars.ExtendedScalars
+import graphql.schema.GraphQLScalarType
+import graphql.schema.idl.RuntimeWiring
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
@@ -17,6 +21,7 @@ import java.time.LocalDateTime
 class TransactionController @Autowired constructor(
     private val transactionService: TransactionService
 ) {
+
     @QueryMapping
     fun transactions(): List<Transaction> {
         return transactionService.getAllTransactions()
@@ -32,10 +37,10 @@ class TransactionController @Autowired constructor(
     fun addTransaction(
         @Argument("sourceAccount") sourceAccount: Account,
         @Argument("destinationAccount") destinationAccount: Account,
-        @Argument("amount") amount: BigDecimal
+        @Argument("amount") amount: Float
     ): Transaction {
         // Validate the arguments
-        if (sourceAccount.accountNumber.isBlank() || destinationAccount.accountNumber.isBlank() || amount <= BigDecimal.ZERO) {
+        if (sourceAccount.accountNumber.isBlank() || destinationAccount.accountNumber.isBlank() || amount <= 0) {
             throw IllegalArgumentException("Invalid transaction data")
         }
 
@@ -43,7 +48,7 @@ class TransactionController @Autowired constructor(
             id = 0,
             sourceAccount = sourceAccount,
             destinationAccount = destinationAccount,
-            amount = amount.setScale(2, RoundingMode.HALF_UP),
+            amount = amount,
             dateTime = LocalDateTime.now()
         )
 
@@ -55,7 +60,7 @@ class TransactionController @Autowired constructor(
         @Argument("id") id: Int,
         @Argument("sourceAccount") sourceAccount: Account?,
         @Argument("destinationAccount") destinationAccount: Account?,
-        @Argument("amount") amount: BigDecimal?,
+        @Argument("amount") amount: Float?,
         @Argument("dateTime") dateTime: LocalDateTime?
     ): Transaction {
         val existingTransaction = transactionService.getTransactionById(id)
@@ -64,7 +69,7 @@ class TransactionController @Autowired constructor(
         val updatedTransaction = existingTransaction.copy(
             sourceAccount = sourceAccount ?: existingTransaction.sourceAccount,
             destinationAccount = destinationAccount ?: existingTransaction.destinationAccount,
-            amount = amount?.setScale(2, RoundingMode.HALF_UP) ?: existingTransaction.amount,
+            amount = amount ?: existingTransaction.amount,
             dateTime = dateTime ?: existingTransaction.dateTime
         )
 

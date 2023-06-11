@@ -1,5 +1,9 @@
 package ucr.ac.cr.investigacion.controller
 
+import graphql.scalars.ExtendedScalars
+import graphql.schema.GraphQLScalarType
+import graphql.schema.idl.RuntimeWiring
+import jakarta.annotation.PostConstruct
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
 import org.springframework.graphql.data.method.annotation.Argument
@@ -18,9 +22,8 @@ class LoanController @Autowired constructor(
     private val loanService: LoanService,
     private val clientService: ClientService
 ) {
-
     @QueryMapping
-    fun getAllLoans(): List<Loan> {
+    fun loans(): List<Loan> {
         return loanService.getAllLoans()
     }
     @QueryMapping
@@ -32,12 +35,12 @@ class LoanController @Autowired constructor(
     @MutationMapping
     fun addLoan(
         @Argument("clientId") clientId: Int,
-        @Argument("amount") amount: BigDecimal,
-        @Argument("interestRate") interestRate: BigDecimal,
+        @Argument("amount") amount: Float,
+        @Argument("interestRate") interestRate: Float,
         @Argument("termMonths") termMonths: Int
     ): Boolean {
         // Validate the arguments
-        if (clientId <= 0 || amount <= BigDecimal.ZERO || interestRate <= BigDecimal.ZERO || termMonths <= 0) {
+        if (clientId <= 0 || amount <= 0 || interestRate <= 0 || termMonths <= 0) {
             throw IllegalArgumentException("Invalid loan data")
         }
 
@@ -45,10 +48,9 @@ class LoanController @Autowired constructor(
             .orElseThrow { NoSuchElementException("Client not found!") }
 
         val loan = Loan(
-            id = null, // The ID will be generated automatically in the database
             client = client,
-            amount = amount.setScale(2, RoundingMode.HALF_UP),
-            interestRate = interestRate.setScale(2, RoundingMode.HALF_UP),
+            amount = amount,
+            interestRate = interestRate,
             termMonths = termMonths
         )
 
@@ -59,8 +61,8 @@ class LoanController @Autowired constructor(
     fun updateLoan(
         @Argument("loanId") loanId: Int,
         @Argument("clientId") clientId: Int,
-        @Argument("amount") amount: BigDecimal,
-        @Argument("interestRate") interestRate: BigDecimal,
+        @Argument("amount") amount: Float?,
+        @Argument("interestRate") interestRate: Float?,
         @Argument("termMonths") termMonths: Int?
     ): Boolean {
         val client = clientService.clientById(clientId)
@@ -69,8 +71,8 @@ class LoanController @Autowired constructor(
         val loan = Loan(
             id = loanId,
             client = client, // Assign the client based on the client ID
-            amount = amount.setScale(2, RoundingMode.HALF_UP),
-            interestRate = interestRate.setScale(2, RoundingMode.HALF_UP),
+            amount = amount,
+            interestRate = interestRate,
             termMonths = termMonths ?: 0
         )
 
