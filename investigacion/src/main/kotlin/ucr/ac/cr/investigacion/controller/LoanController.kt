@@ -10,16 +10,12 @@ import org.springframework.graphql.data.method.annotation.Argument
 import org.springframework.graphql.data.method.annotation.MutationMapping
 import org.springframework.graphql.data.method.annotation.QueryMapping
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.ResponseBody
 import ucr.ac.cr.investigacion.entity.Loan
 import ucr.ac.cr.investigacion.service.ClientService
 import ucr.ac.cr.investigacion.service.LoanService
 import java.util.NoSuchElementException
 
 @Controller
-
 class LoanController @Autowired constructor(
     private val loanService: LoanService,
     private val clientService: ClientService
@@ -28,7 +24,6 @@ class LoanController @Autowired constructor(
     fun loans(): List<Loan> {
         return loanService.getAllLoans()
     }
-
     @QueryMapping
     fun loanById(@Argument id: Int): Loan {
         return loanService.getLoanById(id)
