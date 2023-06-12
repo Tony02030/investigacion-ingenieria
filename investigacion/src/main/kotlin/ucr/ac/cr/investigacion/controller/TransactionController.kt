@@ -18,13 +18,6 @@ class TransactionController @Autowired constructor(
     private val accountService: AccountService
 ) {
 
-    @PostMapping("/transaction")
-    @ResponseBody
-    fun createTransaction(@RequestBody transaction: Transaction): Transaction {
-        val createTransaction = transactionRepository.save(transaction)
-        return createTransaction
-    }
-
     @QueryMapping
     fun transactions(): List<Transaction> {
         return transactionService.getAllTransactions()

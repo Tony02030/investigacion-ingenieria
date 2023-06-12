@@ -17,13 +17,6 @@ class AccountController @Autowired constructor(
     private val accountService: AccountService,
 ){
 
-    @PostMapping("/account")
-    @ResponseBody
-    fun createAccount(@RequestBody account: Account): Account {
-        val createAccount = accountRepository.save(account)
-        return createAccount
-    }
-
     @QueryMapping
     fun accounts(): List<Account> {
         return accountService.getAccounts()
